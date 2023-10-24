@@ -2,8 +2,8 @@ import {createRouter, createWebHashHistory} from 'vue-router'
 import Player from "../Player.vue"
 import Page from "../Page.vue"
 const routes = [
-  { path: '/', component: Page, name: 'Page' },
-  { path: '/player', component: Player, name: 'Player' },
+  { path: '/page', component: Page, name: 'Page' },
+  { path: '/', component: Player, name: 'Player' },
 ]
 
 const router = createRouter({
