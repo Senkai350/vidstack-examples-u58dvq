@@ -8,7 +8,7 @@
       <media-icon class="vds-menu-button-open-icon" type="chevron-right"></media-icon>
     </media-menu-button>
     <media-menu-items class="vds-menu-items">
-      <media-quality-radio-group class="vds-radio-group" hideBitrate="true" autoLabel="Авто">
+      <media-quality-radio-group class="vds-radio-group" hideBitrate="true" autoLabel="Auto">
         <template>
           <media-radio class="vds-radio">
             <div class="vds-radio-check"></div>
