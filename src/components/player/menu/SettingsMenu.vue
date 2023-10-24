@@ -2,7 +2,6 @@
 
 import SpeedMenu from './SpeedMenu.vue'
 import CaptionsMenu from './CaptionsMenu.vue'
-import VoiceMenu from './VoiceMenu.vue'
 import QualityMenu from './QualityMenu.vue'
 import SettingsButton from '../buttons/SettingsButton.vue'
 </script>
@@ -14,7 +13,6 @@ import SettingsButton from '../buttons/SettingsButton.vue'
       <SpeedMenu />
       <QualityMenu />
       <CaptionsMenu />
-      <VoiceMenu />
     </media-menu-items>
   </media-menu>
 </template>
