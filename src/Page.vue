@@ -1,10 +1,12 @@
 <script setup>
+import {useRouter} from "vue-router";
 
+const router = useRouter()
 </script>
 
 <template>
   <div>
-    Page123 test
+    <button @click="router.push({name: 'Player'})">Go to player page and check settings</button>
   </div>
 </template>
 

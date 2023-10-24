@@ -14,17 +14,26 @@ import {
 } from 'vidstack';
 import type { MediaPlayerElement } from 'vidstack/elements';
 import { onMounted, ref } from 'vue';
-
-import AudioLayout from './components/layouts/AudioLayout.vue';
-import VideoLayout from './components/layouts/VideoLayout.vue';
+const router = useRouter()
 import { textTracks } from './tracks';
+import TimeSlider from "./components/player/controls/TimeSlider.vue";
+import PlayButton from "./components/player/buttons/PlayButton.vue";
+import NextButton from "./components/player/buttons/NextButton.vue";
+import VolumeButton from "./components/player/buttons/VolumeButton.vue";
+import VolumeSlider from "./components/player/controls/VolumeSlider.vue";
+import TimeGroup from "./components/player/elements/TimeGroup.vue";
+import CaptionsButton from "./components/player/buttons/CaptionsButton.vue";
+import SettingsButton from "./components/player/buttons/SettingsButton.vue";
+import PipButton from "./components/player/buttons/PipButton.vue";
+import FullscreenButton from "./components/player/buttons/FullscreenButton.vue";
+import {useRouter} from "vue-router";
 
 const $player = ref<MediaPlayerElement>(),
   $src = ref(''),
   $viewType = ref<MediaViewType>('unknown');
 
 // Initialize src.
-changeSource('audio');
+changeSource('video');
 
 onMounted(() => {
   /**
@@ -96,57 +105,204 @@ function changeSource(type: string) {
       />
     </media-provider>
 
-    <AudioLayout v-if="$viewType === 'audio'" />
-    <VideoLayout
-      thumbnails="https://image.mux.com/VZtzUzGRv02OhRnZCxcNg49OilvolTqdnFLEqBsTwaxU/storyboard.vtt"
-      v-if="$viewType === 'video'"
-    />
+    <media-controls  class="vds-controls" style="position: absolute; z-index: 99; bottom: 0;">
+      <div class="vds-controls-spacer"></div>
+      <!-- Time Slider Controls Group -->
+      <div style="background: linear-gradient(180deg, #0c101b00 0%, rgba(16,16,20,255) 100%); width: 100%; display: inline-block">
+        <media-controls-group class="vds-controls-group">
+          <!-- Time Slider -->
+          <TimeSlider />
+        </media-controls-group>
+
+        <!-- Lower Controls Group -->
+        <media-controls-group  class="vds-controls-group">
+          <!-- Play Button -->
+          <PlayButton />
+          <!-- Next Button -->
+          <NextButton  />
+          <!-- Mute Button -->
+          <VolumeButton />
+          <!-- Volume Slider -->
+          <VolumeSlider />
+          <!-- Time Group -->
+          <TimeGroup />
+
+          <media-chapter-title class="vds-chapter-title"></media-chapter-title>
+          <div class="vds-controls-spacer"></div>
+
+          <!-- Caption Button -->
+          <CaptionsButton />
+
+          <!-- Settings Menu -->
+          <media-menu class="vds-menu">
+            <!-- Settings Menu Button -->
+            <SettingsButton />
+          </media-menu>
+
+          <!-- PIP Button -->
+          <PipButton />
+
+          <!-- Fullscreen Button -->
+          <FullscreenButton />
+        </media-controls-group>
+      </div>
+    </media-controls>
   </media-player>
 
   <div class="src-buttons">
-    <button @click="changeSource('audio')">Audio</button>
+    <button @click="router.push({name: 'Page'})">Go to page 2</button>
     <button @click="changeSource('video')">Video</button>
     <button @click="changeSource('hls')">HLS</button>
   </div>
 </template>
 
 <style scoped>
-.player {
+@import 'vidstack/player/styles/default/theme.css';
+
+.loading-spin {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+
+media-player[data-view-type='video'] {
   --media-brand: #f5f5f5;
   --media-focus-ring-color: #4e9cf6;
   --media-focus-ring: 0 0 0 3px var(--media-focus-ring-color);
-}
+  --media-border-radius: 6px;
 
-.player[data-view-type='audio'] {
-  --media-tooltip-y-offset: 44px;
-  --media-menu-y-offset: 40px;
-  --media-slider-chapter-title-color: black;
-  --media-border-radius: 4px;
-  background-color: #212121;
-  border-radius: var(--media-border-radius);
-  contain: layout;
-}
-
-.player[data-view-type='video'] {
   --media-tooltip-y-offset: 30px;
   --media-menu-y-offset: 30px;
-  aspect-ratio: 16 /9;
+
+  contain: layout;
+  aspect-ratio: 16 / 9;
   background-color: #212121;
   border-radius: var(--media-border-radius);
-  contain: layout;
+  height: 100% !important;
 }
 
-.player :deep(video),
+media-player video,
 media-poster {
   border-radius: var(--media-border-radius);
 }
 
-.src-buttons {
+
+
+/*************************************************************************************************
+ * Gestures
+ *************************************************************************************************/
+
+media-gesture {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+media-gesture[action='seek:-10'],
+media-gesture[action='seek:10'] {
+  width: 20%;
+  z-index: 1;
+}
+
+media-gesture[action='seek:10'] {
+  left: unset;
+  right: 0;
+}
+
+/* Remove toggle to pause on touch. */
+@media (pointer: coarse) {
+  media-gesture[action='toggle:paused'] {
+    display: none;
+  }
+}
+
+/* Remove toggle controls on mouse. */
+@media not (pointer: coarse) {
+  media-gesture[action='toggle:controls'] {
+    display: none;
+  }
+}
+
+/*************************************************************************************************
+ * Controls
+ *************************************************************************************************/
+
+media-controls-group {
   display: flex;
   align-items: center;
-  justify-content: space-evenly;
-  margin-top: 40px;
-  margin-inline: auto;
-  max-width: 300px;
+  width: 100%;
+}
+
+media-controls-group {
+  padding-inline: 8px;
+}
+
+media-controls-group:last-child {
+  margin-top: -4px;
+  padding-bottom: 8px;
+}
+
+/*************************************************************************************************
+ * Time Slider
+ *************************************************************************************************/
+
+media-time-slider {
+  --media-slider-height: 40px;
+}
+
+media-time-slider media-slider-value {
+  background-color: unset;
+}
+
+/*************************************************************************************************
+ * Volume
+ *************************************************************************************************/
+
+media-volume-slider {
+  --media-slider-height: 40px;
+  --media-slider-preview-offset: 32px;
+  margin: 0;
+  max-width: 0;
+  transition: all 0.15s ease;
+  transform: translateX(-2px);
+}
+
+:where(*[data-hocus], *:focus-within) + media-volume-slider,
+media-volume-slider[data-active] {
+  margin-left: 4px;
+  max-width: 80px;
+}
+
+/*************************************************************************************************
+ * Time
+ *************************************************************************************************/
+
+.vds-time-group {
+  margin-left: 8px;
+}
+
+/*************************************************************************************************
+ * Captions
+ *************************************************************************************************/
+
+media-captions {
+  z-index: 10;
+  bottom: 0;
+  transition: bottom 0.15s linear;
+}
+
+/* Pull captions up when controls are visible. */
+media-player[data-controls] media-captions {
+  bottom: 80px;
+}
+
+/* Hide captions when interacting with time slider. */
+media-player[data-preview] media-captions {
+  opacity: 0;
 }
 </style>
