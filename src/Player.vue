@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script  setup>
 // Import styles.
 import 'vidstack/player/styles/default/theme.css';
 // Register elements.
@@ -8,11 +8,7 @@ import 'vidstack/icons';
 
 import {
   isHLSProvider,
-  type MediaCanPlayEvent,
-  type MediaProviderChangeEvent,
-  type MediaViewType,
 } from 'vidstack';
-import type { MediaPlayerElement } from 'vidstack/elements';
 import { onMounted, ref } from 'vue';
 const router = useRouter()
 import { textTracks } from './tracks';
@@ -28,36 +24,14 @@ import PipButton from "./components/player/buttons/PipButton.vue";
 import FullscreenButton from "./components/player/buttons/FullscreenButton.vue";
 import {useRouter} from "vue-router";
 
-const $player = ref<MediaPlayerElement>(),
-  $src = ref(''),
-  $viewType = ref<MediaViewType>('unknown');
-
+const $player = ref(null)
+const $src = ref(null)
 // Initialize src.
 changeSource('video');
 
-onMounted(() => {
-  /**
-   * You can add these tracks using HTML as well.
-   *
-   * @example
-   * ```html
-   * <media-provider>
-   *   <track label="..." src="..." kind="..." srclang="..." default />
-   *   <track label="..." src="..." kind="..." srclang="..." />
-   * </media-provider>
-   * ```
-   */
-  for (const track of textTracks) $player.value!.textTracks.add(track);
 
-  // Subscribe to state updates - you can connect them to Vue refs if needed.
-  return $player.value!.subscribe(({ paused, viewType }) => {
-    $viewType.value = viewType;
-    // console.log('is paused?', '->', paused);
-    // console.log('is audio view?', '->', viewType === 'audio');
-  });
-});
 
-function onProviderChange(event: MediaProviderChangeEvent) {
+function onProviderChange(event) {
   const provider = event.detail;
   // We can configure provider's here.
   if (isHLSProvider(provider)) {
@@ -66,11 +40,13 @@ function onProviderChange(event: MediaProviderChangeEvent) {
 }
 
 // We can listen for the `can-play` event to be notified when the player is ready.
-function onCanPlay(event: MediaCanPlayEvent) {
-  // ...
+function onCanPlay(event) {
+  for (const track of textTracks) {
+    $player.value.textTracks.add(track)
+  }
 }
 
-function changeSource(type: string) {
+function changeSource(type) {
   const muxPlaybackId = 'VZtzUzGRv02OhRnZCxcNg49OilvolTqdnFLEqBsTwaxU';
   switch (type) {
     case 'audio':
@@ -179,7 +155,6 @@ media-player[data-view-type='video'] {
   aspect-ratio: 16 / 9;
   background-color: #212121;
   border-radius: var(--media-border-radius);
-  height: 100% !important;
 }
 
 media-player video,
